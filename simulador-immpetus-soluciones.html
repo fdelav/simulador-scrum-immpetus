@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulador Scrum — Immpetus Soluciones</title>
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --surface: #ffffff;
+      --surface-alt: #f8fafc;
+      --border: #d8e0ea;
+      --primary: #1e3a5f;
+      --primary-hover: #152b47;
+      --accent: #2b6cb0;
+      --accent-soft: #ebf4ff;
+      --text: #1a202c;
+      --text-muted: #5a6779;
+      --success-bg: #eef7f1;
+      --success-border: #86c79c;
+      --success-text: #1c5c34;
+      --warn-bg: #fff8eb;
+      --warn-border: #e6b450;
+      --warn-text: #7a4f06;
+      --danger-bg: #fdf1f1;
+      --danger-border: #e08282;
+      --danger-text: #8c2323;
+      --radius: 10px;
+      --shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding-bottom: 3rem;
+    }
+
+    header {
+      background: var(--primary);
+      color: #ffffff;
+      padding: 1.25rem 2rem;
+      box-shadow: var(--shadow);
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-title h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .header-title p {
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      margin-top: 0.15rem;
+    }
+
+    .json-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      align-items: center;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      border: 1px solid transparent;
+      border-radius: 7px;
+      padding: 0.55rem 0.95rem;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-light {
+      background: #ffffff;
+      color: var(--primary);
+      border-color: #cbd5e1;
+    }
+
+    .btn-light:hover {
+      background: #f1f5f9;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--primary);
+      border-color: var(--border);
+    }
+
+    .btn-outline:hover {
+      background: var(--surface-alt);
+      border-color: var(--accent);
+    }
+
+    .btn-danger {
+      background: var(--danger-bg);
+      color: var(--danger-text);
+      border-color: var(--danger-border);
+      padding: 0.4rem 0.65rem;
+      font-size: 0.82rem;
+    }
+
+    .btn-danger:hover {
+      background: #f9dede;
+    }
+
+    nav.tabs {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .tabs-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      gap: 0.25rem;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      padding: 0.9rem 1.15rem;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .tab-btn:hover {
+      color: var(--primary);
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--accent);
+    }
+
+    .tab-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      background: var(--surface-alt);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.05rem 0.45rem;
+      margin-left: 0.35rem;
+      font-weight: 500;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 1.75rem auto 0;
+      padding: 0 2rem;
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1.1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-header h2 {
+      font-size: 1.12rem;
+      color: var(--primary);
+    }
+
+    .card-header span.sub {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+    }
+
+    .form-group {
+      margin-bottom: 1.15rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 0.4rem;
+    }
+
+    input[type="text"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 0.65rem 0.8rem;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-family: inherit;
+      font-size: 0.92rem;
+      color: var(--text);
+      background: #ffffff;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.14);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 92px;
+    }
+
+    .alert {
+      border-radius: 8px;
+      padding: 0.9rem 1.1rem;
+      margin-bottom: 1.25rem;
+      border: 1px solid;
+      font-size: 0.9rem;
+    }
+
+    .alert-danger {
+      background: var(--danger-bg);
+      border-color: var(--danger-border);
+      color: var(--danger-text);
+    }
+
+    .alert-warn {
+      background: var(--warn-bg);
+      border-color: var(--warn-border);
+      color: var(--warn-text);
+    }
+
+    .alert-success {
+      background: var(--success-bg);
+      border-color: var(--success-border);
+      color: var(--success-text);
+    }
+
+    .alert ul {
+      margin-top: 0.4rem;
+      margin-left: 1.25rem;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    th {
+      text-align: left;
+      background: var(--surface-alt);
+      color: var(--primary);
+      font-weight: 600;
+      padding: 0.7rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.84rem;
+    }
+
+    td {
+      padding: 0.6rem 0.75rem;
+      border-bottom: 1px solid #edf2f7;
+      vertical-align: top;
+    }
+
+    .role-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: 1rem;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      background: var(--accent-soft);
+      color: var(--primary);
+      border: 1px solid #c3dafe;
+    }
+
+    .pill.ok {
+      background: var(--success-bg);
+      color: var(--success-text);
+      border-color: var(--success-border);
+    }
+
+    .pill.bad {
+      background: var(--danger-bg);
+      color: var(--danger-text);
+      border-color: var(--danger-border);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    @media (max-width: 820px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+      header, nav.tabs, main {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+    }
+
+    .placeholder-box {
+      text-align: center;
+      padding: 3rem 1.5rem;
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      color: var(--text-muted);
+    }
+
+    .placeholder-box h3 {
+      color: var(--primary);
+      margin-bottom: 0.45rem;
+    }
+
+    pre.json-preview {
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 1rem;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      overflow-x: auto;
+      max-height: 360px;
+      line-height: 1.45;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 1.25rem;
+      right: 1.25rem;
+      background: var(--primary);
+      color: #ffffff;
+      padding: 0.75rem 1.1rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.2);
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 50;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <div class="header-title">
+        <h1>Simulador de Gestión Scrum</h1>
+        <p id="header-project-subtitle">Sistema de automatización de selección de CVs — Immpetus Soluciones</p>
+      </div>
+      <div class="json-actions">
+        <button type="button" class="btn btn-light" id="btn-descargar-json">⬇ Descargar estado JSON</button>
+        <label for="input-cargar-json" class="btn btn-light" style="margin-bottom: 0;">⬆ Cargar estado JSON</label>
+        <input type="file" id="input-cargar-json" accept=".json,application/json" style="display: none;" />
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs" aria-label="Navegación del proyecto Scrum">
+    <div class="tabs-inner">
+      <button type="button" class="tab-btn active" data-tab="inicio">Inicio</button>
+      <button type="button" class="tab-btn" data-tab="backlog">Product Backlog <span class="tab-badge">Próximamente</span></button>
+      <button type="button" class="tab-btn" data-tab="planning">Sprint Planning <span class="tab-badge">Próximamente</span></button>
+      <button type="button" class="tab-btn" data-tab="tablero">Tablero <span class="tab-badge">Próximamente</span></button>
+      <button type="button" class="tab-btn" data-tab="radiadores">Radiadores <span class="tab-badge">Próximamente</span></button>
+      <button type="button" class="tab-btn" data-tab="cierre">Cierre <span class="tab-badge">Próximamente</span></button>
+    </div>
+  </nav>
+
+  <main>
+    <!-- PESTAÑA 1: INICIO -->
+    <section id="tab-inicio" class="tab-panel active">
+
+      <div id="alerta-scrum-container"></div>
+
+      <!-- Datos generales del proyecto -->
+      <div class="card">
+        <div class="card-header">
+          <h2>1. Acta Ágil: Proyecto, Visión y Objetivo del Producto</h2>
+          <span class="sub">Sincronizado automáticamente con el objeto <code>estado</code></span>
+        </div>
+
+        <div class="form-group">
+          <label for="campo-proyecto">Nombre del proyecto</label>
+          <input type="text" id="campo-proyecto" placeholder="Ej. Sistema de automatización de selección de CVs" />
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="campo-vision">Visión del Producto (Plantilla de Moore)</label>
+            <textarea id="campo-vision" rows="6" placeholder="Para [cliente/usuario] que [necesidad]..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="campo-objetivo">Objetivo del Producto</label>
+            <textarea id="campo-objetivo" rows="6" placeholder="Compromiso único, observable y con horizonte temporal..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Equipo Scrum -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2>2. Equipo Scrum</h2>
+            <span class="sub">Regla Scrum: exactamente 1 Product Owner, al menos 1 Scrum Master y al menos 1 Developer</span>
+          </div>
+          <button type="button" class="btn btn-primary" id="btn-agregar-miembro">+ Agregar integrante</button>
+        </div>
+
+        <div class="role-summary" id="resumen-roles"></div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 32%;">Nombre del integrante</th>
+                <th style="width: 22%;">Rol en Scrum</th>
+                <th style="width: 36%;">Nota / Detalle de responsabilidad</th>
+                <th style="width: 10%;">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-equipo"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Interesados -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2>3. Interesados (Stakeholders)</h2>
+            <span class="sub">Matriz de Poder e Interés para gestión de expectativas</span>
+          </div>
+          <button type="button" class="btn btn-primary" id="btn-agregar-interesado">+ Agregar interesado</button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 50%;">Nombre / Grupo de interés</th>
+                <th style="width: 20%;">Nivel de Poder</th>
+                <th style="width: 20%;">Nivel de Interés</th>
+                <th style="width: 10%;">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-interesados"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Vista previa del objeto estado en vivo -->
+      <div class="card">
+        <div class="card-header">
+          <h2>4. Vista previa del objeto <code>estado</code> (JSON)</h2>
+          <button type="button" class="btn btn-outline" id="btn-copiar-json">Copiar JSON</button>
+        </div>
+        <pre class="json-preview" id="json-preview"></pre>
+      </div>
+    </section>
+
+    <!-- PESTAÑAS EN CONSTRUCCIÓN -->
+    <section id="tab-backlog" class="tab-panel">
+      <div class="placeholder-box">
+        <h3>Product Backlog</h3>
+        <p>Esta sección se construirá en la siguiente iteración. Usará el objeto <code>estado</code> configurado en Inicio.</p>
+      </div>
+    </section>
+
+    <section id="tab-planning" class="tab-panel">
+      <div class="placeholder-box">
+        <h3>Sprint Planning</h3>
+        <p>Esta sección se construirá en la siguiente iteración para planificar los Sprints y asignar capacidad del equipo.</p>
+      </div>
+    </section>
+
+    <section id="tab-tablero" class="tab-panel">
+      <div class="placeholder-box">
+        <h3>Tablero Scrum</h3>
+        <p>Esta sección se construirá en la siguiente iteración para visualizar el flujo del Sprint activo.</p>
+      </div>
+    </section>
+
+    <section id="tab-radiadores" class="tab-panel">
+      <div class="placeholder-box">
+        <h3>Radiadores de Información</h3>
+        <p>Esta sección se construirá en la siguiente iteración para mostrar métricas de avance y seguimiento de objetivos.</p>
+      </div>
+    </section>
+
+    <section id="tab-cierre" class="tab-panel">
+      <div class="placeholder-box">
+        <h3>Cierre del Proyecto</h3>
+        <p>Esta sección se construirá en la siguiente iteración para consolidar entregables, lecciones aprendidas y métricas finales.</p>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    // Datos precargados exactamente según la estructura JSON del Capítulo 3
+    const DATOS_INICIALES = {
+      proyecto: "Sistema de automatización de selección de CVs — Immpetus Soluciones",
+      vision: "Para las empresas cliente, el área de selección y los candidatos que postulan a las convocatorias de Immpetus Soluciones que sufren procesos lentos, poca visibilidad y vacantes difíciles de consultar o aprovechar a largo plazo, nuestra plataforma de gestión y selección asistida es una solución web y en la nube con páginas por vacante, trazabilidad centralizada y calificación asistida por IA bajo control humano que acelera la gestión de convocatorias y conserva perfiles valiosos de forma responsable. A diferencia de un esquema fragmentado con web estática, archivos dispersos y reportes manuales, nuestro producto ofrece trazabilidad, agilidad y respeto por los datos y la decisión humana.",
+      objetivoProducto: "Al cabo de 9 semanas, contar con una plataforma web y en la nube operativa para la gestión de convocatorias y hojas de vida con trazabilidad centralizada y asistencia de IA bajo supervisión humana, reduciendo en al menos un 80 % las horas administrativas por convocatoria frente a la operación manual actual (manteniendo como indicadores complementarios de seguimiento la reducción ≥ 40 % en días hasta enviar la terna, ≥ 30 % de postulaciones desde la web y ≥ 10 % de ternas desde la Reserva Estratégica).",
+      equipo: {
+        productOwner: {
+          nombre: "Fabián Esteban de la Torre Vidal",
+          nota: "Actúa también como Developer en la práctica; se debe separar el rol de PO (priorización por valor y ética/datos) del trabajo técnico para evitar sesgos."
+        },
+        scrumMaster: {
+          nombre: "Jerónimo Alejandro Díaz Rozo",
+          nota: "Actúa también como Developer en la práctica; debe cuidar que las tareas técnicas no desplacen la facilitación ágil ni la remoción de impedimentos."
+        },
+        developers: [
+          {
+            nombre: "Justin Thomas Moreno Solano",
+            rolEnEquipo: "Developer"
+          },
+          {
+            nombre: "Santiago Londoño Pacheco",
+            rolEnEquipo: "Developer"
+          },
+          {
+            nombre: "Fabián Esteban de la Torre Vidal",
+            rolEnEquipo: "Developer (con rol principal de Product Owner)"
+          },
+          {
+            nombre: "Jerónimo Alejandro Díaz Rozo",
+            rolEnEquipo: "Developer (con rol principal de Scrum Master)"
+          }
+        ]
+      },
+      interesados: [
+        "Gerencia / Patrocinador de Immpetus Soluciones",
+        "Analista / Líder de Recursos Humanos",
+        "Equipo técnico / TI de Immpetus Soluciones",
+        "Candidatos / personas que buscan empleo",
+        "Empresas cliente que contratan los servicios de selección",
+        "Entidades reguladoras / marco legal (protección de datos personales — Ley 1581 de 2012 — y normativa laboral)"
+      ]
+    };
+
+    // Valores por defecto de Poder e Interés sugeridos para la precarga de Immpetus
+    const PODER_INTERES_POR_DEFECTO = {
+      "Gerencia / Patrocinador de Immpetus Soluciones": { poder: "Alto", interes: "Alto" },
+      "Analista / Líder de Recursos Humanos": { poder: "Medio", interes: "Alto" },
+      "Equipo técnico / TI de Immpetus Soluciones": { poder: "Medio", interes: "Medio" },
+      "Candidatos / personas que buscan empleo": { poder: "Bajo", interes: "Alto" },
+      "Empresas cliente que contratan los servicios de selección": { poder: "Alto", interes: "Medio" },
+      "Entidades reguladoras / marco legal (protección de datos personales — Ley 1581 de 2012 — y normativa laboral)": { poder: "Alto", interes: "Bajo" }
+    };
+
+    // Objeto global 'estado' que conserva la estructura JSON del Capítulo 3
+    let estado = JSON.parse(JSON.stringify(DATOS_INICIALES));
+
+    // Estado de UI editable para filas dinámicas del formulario
+    let filasEquipoUI = [];
+    let filasInteresadosUI = [];
+
+    function mostrarToast(mensaje) {
+      const toast = document.getElementById("toast");
+      toast.textContent = mensaje;
+      toast.classList.add("show");
+      clearTimeout(mostrarToast._timer);
+      mostrarToast._timer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2600);
+    }
+
+    // Convierte el objeto 'estado' en filas editables para la tabla de equipo
+    function hidratarUIFromEstado(data) {
+      filasEquipoUI = [];
+
+      if (data.equipo) {
+        if (Array.isArray(data.equipo.productOwner)) {
+          data.equipo.productOwner.forEach(po => {
+            if (po && (po.nombre || po.nota)) {
+              filasEquipoUI.push({
+                nombre: po.nombre || "",
+                rol: "Product Owner",
+                nota: po.nota || ""
+              });
+            }
+          });
+        } else if (data.equipo.productOwner && (data.equipo.productOwner.nombre || data.equipo.productOwner.nota)) {
+          filasEquipoUI.push({
+            nombre: data.equipo.productOwner.nombre || "",
+            rol: "Product Owner",
+            nota: data.equipo.productOwner.nota || ""
+          });
+        }
+
+        if (Array.isArray(data.equipo.scrumMaster)) {
+          data.equipo.scrumMaster.forEach(sm => {
+            if (sm && (sm.nombre || sm.nota)) {
+              filasEquipoUI.push({
+                nombre: sm.nombre || "",
+                rol: "Scrum Master",
+                nota: sm.nota || ""
+              });
+            }
+          });
+        } else if (data.equipo.scrumMaster && (data.equipo.scrumMaster.nombre || data.equipo.scrumMaster.nota)) {
+          filasEquipoUI.push({
+            nombre: data.equipo.scrumMaster.nombre || "",
+            rol: "Scrum Master",
+            nota: data.equipo.scrumMaster.nota || ""
+          });
+        }
+
+        if (Array.isArray(data.equipo.developers)) {
+          data.equipo.developers.forEach(dev => {
+            if (typeof dev === "string") {
+              filasEquipoUI.push({
+                nombre: dev,
+                rol: "Developer",
+                nota: "Developer"
+              });
+            } else if (dev) {
+              filasEquipoUI.push({
+                nombre: dev.nombre || "",
+                rol: "Developer",
+                nota: dev.rolEnEquipo || dev.nota || "Developer"
+              });
+            }
+          });
+        }
+      }
+
+      filasInteresadosUI = [];
+      if (Array.isArray(data.interesados)) {
+        data.interesados.forEach(item => {
+          if (typeof item === "string") {
+            const preset = PODER_INTERES_POR_DEFECTO[item] || { poder: "Medio", interes: "Medio" };
+            filasInteresadosUI.push({
+              nombre: item,
+              poder: preset.poder,
+              interes: preset.interes
+            });
+          } else if (item && typeof item === "object") {
+            filasInteresadosUI.push({
+              nombre: item.nombre || "",
+              poder: item.poder || "Medio",
+              interes: item.interes || "Medio"
+            });
+          }
+        });
+      }
+    }
+
+    // Sincroniza los inputs de la interfaz hacia el objeto 'estado'
+    function sincronizarEstadoDesdeUI() {
+      const proyecto = document.getElementById("campo-proyecto").value.trim();
+      const vision = document.getElementById("campo-vision").value.trim();
+      const objetivoProducto = document.getElementById("campo-objetivo").value.trim();
+
+      const pos = filasEquipoUI.filter(m => m.rol === "Product Owner" && m.nombre.trim() !== "");
+      const sms = filasEquipoUI.filter(m => m.rol === "Scrum Master" && m.nombre.trim() !== "");
+      const devs = filasEquipoUI.filter(m => m.rol === "Developer" && m.nombre.trim() !== "");
+
+      let productOwnerObj = null;
+      if (pos.length === 1) {
+        productOwnerObj = {
+          nombre: pos[0].nombre.trim(),
+          nota: pos[0].nota.trim()
+        };
+      } else if (pos.length > 1) {
+        productOwnerObj = pos.map(p => ({
+          nombre: p.nombre.trim(),
+          nota: p.nota.trim()
+        }));
+      }
+
+      let scrumMasterObj = null;
+      if (sms.length === 1) {
+        scrumMasterObj = {
+          nombre: sms[0].nombre.trim(),
+          nota: sms[0].nota.trim()
+        };
+      } else if (sms.length > 1) {
+        scrumMasterObj = sms.map(s => ({
+          nombre: s.nombre.trim(),
+          nota: s.nota.trim()
+        }));
+      }
+
+      const developersArr = devs.map(d => ({
+        nombre: d.nombre.trim(),
+        rolEnEquipo: d.nota.trim() || "Developer"
+      }));
+
+      // Mantiene estructura compatible con Capítulo 3 y conserva poder/interés si se personalizó
+      const interesadosArr = filasInteresadosUI
+        .filter(i => i.nombre.trim() !== "")
+        .map(i => ({
+          nombre: i.nombre.trim(),
+          poder: i.poder,
+          interes: i.interes
+        }));
+
+      estado = {
+        proyecto,
+        vision,
+        objetivoProducto,
+        equipo: {
+          productOwner: productOwnerObj,
+          scrumMaster: scrumMasterObj,
+          developers: developersArr
+        },
+        interesados: interesadosArr
+      };
+
+      document.getElementById("header-project-subtitle").textContent =
+        proyecto || "Proyecto sin nombre definido";
+
+      validarReglasScrum(pos.length, sms.length, devs.length);
+      actualizarVistaPreviaJSON();
+    }
+
+    function validarReglasScrum(countPO, countSM, countDev) {
+      const resumenEl = document.getElementById("resumen-roles");
+      const alertaContainer = document.getElementById("alerta-scrum-container");
+
+      resumenEl.innerHTML = `
+        <span class="pill ${countPO === 1 ? "ok" : "bad"}">Product Owner: ${countPO} (requerido: exactamente 1)</span>
+        <span class="pill ${countSM >= 1 ? "ok" : "bad"}">Scrum Master: ${countSM} (requerido: ≥ 1)</span>
+        <span class="pill ${countDev >= 1 ? "ok" : "bad"}">Developers: ${countDev} (requerido: ≥ 1)</span>
+      `;
+
+      const errores = [];
+      if (countPO === 0) {
+        errores.push("Falta asignar un <strong>Product Owner</strong> (debe haber exactamente 1).");
+      } else if (countPO > 1) {
+        errores.push(`Hay <strong>${countPO} Product Owners</strong> asignados. Scrum exige exactamente <strong>1 Product Owner</strong> para mantener una única voz de priorización.`);
+      }
+
+      if (countSM < 1) {
+        errores.push("Falta asignar al menos una persona en el rol de <strong>Scrum Master</strong>.");
+      }
+
+      if (countDev < 1) {
+        errores.push("Falta asignar al menos un integrante en el rol de <strong>Developer</strong>.");
+      }
+
+      // Advertencia informativa si alguien comparte responsabilidades en la práctica
+      const nombresPO = filasEquipoUI.filter(m => m.rol === "Product Owner").map(m => m.nombre.trim().toLowerCase()).filter(Boolean);
+      const nombresSM = filasEquipoUI.filter(m => m.rol === "Scrum Master").map(m => m.nombre.trim().toLowerCase()).filter(Boolean);
+      const nombresDev = filasEquipoUI.filter(m => m.rol === "Developer").map(m => m.nombre.trim().toLowerCase()).filter(Boolean);
+
+      const dobleRolInfo = [];
+      nombresPO.forEach(n => {
+        if (nombresSM.includes(n)) {
+          dobleRolInfo.push("Una misma persona figura como <strong>Product Owner y Scrum Master</strong> a la vez; conviene separar ambos roles para evitar conflicto entre prioridades de negocio y facilitación.");
+        }
+        if (nombresDev.includes(n)) {
+          dobleRolInfo.push("El <strong>Product Owner</strong> también participa como <strong>Developer</strong>; recuerden separar las decisiones de valor de las preferencias técnicas.");
+        }
+      });
+      nombresSM.forEach(n => {
+        if (nombresDev.includes(n)) {
+          dobleRolInfo.push("La <strong>Scrum Master</strong> también participa como <strong>Developer</strong>; cuiden que la carga técnica no desplace la facilitación ni la remoción de impedimentos.");
+        }
+      });
+
+      let htmlAlertas = "";
+
+      if (errores.length > 0) {
+        htmlAlertas += `
+          <div class="alert alert-danger" role="alert">
+            <strong>⚠ Configuración de roles Scrum incompleta o inválida:</strong>
+            <ul>${errores.map(e => `<li>${e}</li>`).join("")}</ul>
+          </div>
+        `;
+      } else {
+        htmlAlertas += `
+          <div class="alert alert-success" role="status">
+            <strong>✓ Estructura de roles Scrum válida:</strong> Se cumple con exactamente 1 Product Owner, ${countSM} Scrum Master y ${countDev} Developer(s).
+          </div>
+        `;
+      }
+
+      if (dobleRolInfo.length > 0) {
+        const unicos = [...new Set(dobleRolInfo)];
+        htmlAlertas += `
+          <div class="alert alert-warn" role="status">
+            <strong>Nota de Coaching Ágil sobre responsabilidades compartidas:</strong>
+            <ul>${unicos.map(w => `<li>${w}</li>`).join("")}</ul>
+          </div>
+        `;
+      }
+
+      alertaContainer.innerHTML = htmlAlertas;
+    }
+
+    function renderizarTablaEquipo() {
+      const tbody = document.getElementById("tbody-equipo");
+      tbody.innerHTML = "";
+
+      filasEquipoUI.forEach((miembro, idx) => {
+        const tr = document.createElement("tr");
+
+        const tdNombre = document.createElement("td");
+        const inputNombre = document.createElement("input");
+        inputNombre.type = "text";
+        inputNombre.value = miembro.nombre;
+        inputNombre.placeholder = "Nombre completo";
+        inputNombre.addEventListener("input", (e) => {
+          filasEquipoUI[idx].nombre = e.target.value;
+          sincronizarEstadoDesdeUI();
+        });
+        tdNombre.appendChild(inputNombre);
+
+        const tdRol = document.createElement("td");
+        const selectRol = document.createElement("select");
+        ["Product Owner", "Scrum Master", "Developer"].forEach(rol => {
+          const opt = document.createElement("option");
+          opt.value = rol;
+          opt.textContent = rol;
+          if (miembro.rol === rol) opt.selected = true;
+          selectRol.appendChild(opt);
+        });
+        selectRol.addEventListener("change", (e) => {
+          filasEquipoUI[idx].rol = e.target.value;
+          sincronizarEstadoDesdeUI();
+        });
+        tdRol.appendChild(selectRol);
+
+        const tdNota = document.createElement("td");
+        const inputNota = document.createElement("input");
+        inputNota.type = "text";
+        inputNota.value = miembro.nota;
+        inputNota.placeholder = "Ej. Developer / Notas de responsabilidad";
+        inputNota.addEventListener("input", (e) => {
+          filasEquipoUI[idx].nota = e.target.value;
+          sincronizarEstadoDesdeUI();
+        });
+        tdNota.appendChild(inputNota);
+
+        const tdAccion = document.createElement("td");
+        const btnEliminar = document.createElement("button");
+        btnEliminar.type = "button";
+        btnEliminar.className = "btn btn-danger";
+        btnEliminar.textContent = "Quitar";
+        btnEliminar.addEventListener("click", () => {
+          filasEquipoUI.splice(idx, 1);
+          renderizarTablaEquipo();
+          sincronizarEstadoDesdeUI();
+        });
+        tdAccion.appendChild(btnEliminar);
+
+        tr.appendChild(tdNombre);
+        tr.appendChild(tdRol);
+        tr.appendChild(tdNota);
+        tr.appendChild(tdAccion);
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderizarTablaInteresados() {
+      const tbody = document.getElementById("tbody-interesados");
+      tbody.innerHTML = "";
+
+      filasInteresadosUI.forEach((interesado, idx) => {
+        const tr = document.createElement("tr");
+
+        const tdNombre = document.createElement("td");
+        const inputNombre = document.createElement("input");
+        inputNombre.type = "text";
+        inputNombre.value = interesado.nombre;
+        inputNombre.placeholder = "Nombre o grupo de interés";
+        inputNombre.addEventListener("input", (e) => {
+          filasInteresadosUI[idx].nombre = e.target.value;
+          sincronizarEstadoDesdeUI();
+        });
+        tdNombre.appendChild(inputNombre);
+
+        const tdPoder = document.createElement("td");
+        const selectPoder = document.createElement("select");
+        ["Alto", "Medio", "Bajo"].forEach(nivel => {
+          const opt = document.createElement("option");
+          opt.value = nivel;
+          opt.textContent = nivel;
+          if (interesado.poder === nivel) opt.selected = true;
+          selectPoder.appendChild(opt);
+        });
+        selectPoder.addEventListener("change", (e) => {
+          filasInteresadosUI[idx].poder = e.target.value;
+          sincronizarEstadoDesdeUI();
+        });
+        tdPoder.appendChild(selectPoder);
+
+        const tdInteres = document.createElement("td");
+        const selectInteres = document.createElement("select");
+        ["Alto", "Medio", "Bajo"].forEach(nivel => {
+          const opt = document.createElement("option");
+          opt.value = nivel;
+          opt.textContent = nivel;
+          if (interesado.interes === nivel) opt.selected = true;
+          selectInteres.appendChild(opt);
+        });
+        selectInteres.addEventListener("change", (e) => {
+          filasInteresadosUI[idx].interes = e.target.value;
+          sincronizarEstadoDesdeUI();
+        });
+        tdInteres.appendChild(selectInteres);
+
+        const tdAccion = document.createElement("td");
+        const btnEliminar = document.createElement("button");
+        btnEliminar.type = "button";
+        btnEliminar.className = "btn btn-danger";
+        btnEliminar.textContent = "Quitar";
+        btnEliminar.addEventListener("click", () => {
+          filasInteresadosUI.splice(idx, 1);
+          renderizarTablaInteresados();
+          sincronizarEstadoDesdeUI();
+        });
+        tdAccion.appendChild(btnEliminar);
+
+        tr.appendChild(tdNombre);
+        tr.appendChild(tdPoder);
+        tr.appendChild(tdInteres);
+        tr.appendChild(tdAccion);
+        tbody.appendChild(tr);
+      });
+    }
+
+    function actualizarVistaPreviaJSON() {
+      const preview = document.getElementById("json-preview");
+      preview.textContent = JSON.stringify(estado, null, 2);
+    }
+
+    function cargarEstadoEnFormulario(nuevoEstado) {
+      document.getElementById("campo-proyecto").value = nuevoEstado.proyecto || "";
+      document.getElementById("campo-vision").value = nuevoEstado.vision || "";
+      document.getElementById("campo-objetivo").value = nuevoEstado.objetivoProducto || "";
+
+      hidratarUIFromEstado(nuevoEstado);
+      renderizarTablaEquipo();
+      renderizarTablaInteresados();
+      sincronizarEstadoDesdeUI();
+    }
+
+    // Navegación entre las 6 pestañas
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+        btn.classList.add("active");
+        const target = document.getElementById("tab-" + btn.dataset.tab);
+        if (target) target.classList.add("active");
+      });
+    });
+
+    // Eventos de campos principales
+    ["campo-proyecto", "campo-vision", "campo-objetivo"].forEach(id => {
+      document.getElementById(id).addEventListener("input", sincronizarEstadoDesdeUI);
+    });
+
+    // Agregar miembro al equipo
+    document.getElementById("btn-agregar-miembro").addEventListener("click", () => {
+      filasEquipoUI.push({
+        nombre: "",
+        rol: "Developer",
+        nota: "Developer"
+      });
+      renderizarTablaEquipo();
+      sincronizarEstadoDesdeUI();
+    });
+
+    // Agregar interesado
+    document.getElementById("btn-agregar-interesado").addEventListener("click", () => {
+      filasInteresadosUI.push({
+        nombre: "",
+        poder: "Medio",
+        interes: "Medio"
+      });
+      renderizarTablaInteresados();
+      sincronizarEstadoDesdeUI();
+    });
+
+    // Descargar objeto estado como archivo JSON
+    document.getElementById("btn-descargar-json").addEventListener("click", () => {
+      sincronizarEstadoDesdeUI();
+      const contenido = JSON.stringify(estado, null, 2);
+      const blob = new Blob([contenido], { type: "application/json;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const enlace = document.createElement("a");
+      enlace.href = url;
+      enlace.download = "estado-immpetus-soluciones.json";
+      document.body.appendChild(enlace);
+      enlace.click();
+      document.body.removeChild(enlace);
+      URL.revokeObjectURL(url);
+      mostrarToast("Archivo JSON descargado correctamente.");
+    });
+
+    // Cargar archivo JSON y restaurar estado
+    document.getElementById("input-cargar-json").addEventListener("change", (event) => {
+      const archivo = event.target.files[0];
+      if (!archivo) return;
+
+      const lector = new FileReader();
+      lector.onload = (e) => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (!parsed || typeof parsed !== "object") {
+            throw new Error("El archivo no contiene un objeto JSON válido.");
+          }
+          cargarEstadoEnFormulario(parsed);
+          mostrarToast("Estado cargado desde el archivo JSON.");
+        } catch (err) {
+          alert("Error al leer el archivo JSON: " + err.message);
+        } finally {
+          event.target.value = "";
+        }
+      };
+      lector.readAsText(archivo, "utf-8");
+    });
+
+    // Copiar JSON al portapapeles
+    document.getElementById("btn-copiar-json").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(JSON.stringify(estado, null, 2));
+        mostrarToast("JSON copiado al portapapeles.");
+      } catch (err) {
+        mostrarToast("No se pudo copiar automáticamente; usa el botón Descargar.");
+      }
+    });
+
+    // Inicialización al cargar la página
+    cargarEstadoEnFormulario(DATOS_INICIALES);
+  </script>
+</body>
+</html>
